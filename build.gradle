@@ -1,0 +1,37 @@
+/*
+Root Build file for the upload-service project.
+ */
+
+apply from: 'https://raw.githubusercontent.com/adazza/adazza-gradle/master/adazza-service.gradle'
+apply from: 'https://raw.githubusercontent.com/adazza/adazza-gradle/master/adazza-scrooge.gradle'
+apply from: 'https://raw.githubusercontent.com/adazza/adazza-gradle/master/adazza-dependency-management.gradle'
+
+allprojects {
+  group = "com.adazza.example"
+
+  test {
+    testLogging {
+      events = ['standard_out', 'standard_error', 'passed', 'skipped', 'failed']
+    }
+  }
+}
+
+configure(subprojects.findAll { it.name.endsWith('-server') }) {
+  mainClassName = 'com.adazza.example.Application'
+
+  dependencies {
+    compile "com.twitter:finatra-http_$scalaVersion"
+    compile "com.twitter:finatra-thrift_$scalaVersion"
+
+    compile "ch.qos.logback:logback-classic:1.0.13"
+
+    compile group: 'com.adazza.common', name: "common-finagle_$scalaVersion"
+    compile group: 'com.adazza.common', name: "common-utils_$scalaVersion"
+
+    testCompile "com.twitter:finatra-http_$scalaVersion:$finatraVersion:tests"
+    testCompile "com.twitter:finatra-thrift_$scalaVersion:$finatraVersion:tests"
+  }
+
+  apply from: 'https://raw.githubusercontent.com/adazza/adazza-gradle/master/adazza-dynamo-local.gradle'
+}
+
